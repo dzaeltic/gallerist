@@ -46,6 +46,24 @@ const MemeSchema = new Schema({
   imageId: String,
 });
 
+const ShowcaseSchema = new Schema({
+  curator: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  curatorName: String,
+  title: String,
+  message: String,
+  musicUrl: String,
+  artPieces: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Art',
+  }],
+  startDate: Date,
+  endDate: Date,
+  auctionDate: Date, // For future expansion
+});
+
 const VaultSchema = new Schema({
   name: String,
   owner: {
@@ -90,10 +108,11 @@ const WatchedSchema = new Schema({
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
+const Showcase = model('Showcase', ShowcaseSchema);
 const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
 
 module.exports = {
-  User, Art, Meme, Vault, AICart, Watch,
+  User, Art, Meme, Showcase, Vault, AICart, Watch,
 };
