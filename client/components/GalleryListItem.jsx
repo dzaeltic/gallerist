@@ -43,15 +43,19 @@ function GalleryListItem({ image, users }) {
               {' '}
               {image.title}
             </div>
+            {image.userGallery && (
             <div>
-              Curated by:
-              {' '}
-              {image.userGallery.name}
+              <div>
+                Curated by:
+                {' '}
+                {image.userGallery.title}
+              </div>
+              <Button variant="primary" value={image.userGallery.title} onClick={addFriend}>
+                Add Friend
+              </Button>
+              <WatchItem imgTitle={image.title} isForSale={image.isForSale} users={users} />
             </div>
-            <Button variant="primary" value={image.userGallery.name} onClick={addFriend}>
-              Add Friend
-            </Button>
-            <WatchItem imgTitle={image.title} isForSale={image.isForSale} users={users} />
+            )}
           </div>
           <Link to={`/home/art/${image.imageId}`}>Click here for more details...</Link>
           <br />

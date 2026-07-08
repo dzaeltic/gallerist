@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const findOrCreate = require('mongoose-findorcreate');
+require('dotenv').config();
 
 const { Schema, model } = mongoose;
 const db_uri = process.env.DB_URI;
