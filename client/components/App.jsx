@@ -13,6 +13,7 @@ import PalGallery from './PalGallery';
 import Quiz from './quiz/Quiz';
 import MemeMaker from './meme/MemeMaker';
 import ShowcaseList from './Showcase/ShowcaseList';
+import ShowcaseDetail from './Showcase/ShowcaseDetail';
 import ArtHeist from './ArtHeist/ArtHeist';
 import CrackCode from './ArtHeist/CrackCode';
 
@@ -56,6 +57,10 @@ const App = createBrowserRouter([
       {
         path: '/home/showcase',
         element: <ShowcaseList />,
+      },
+      {
+        path: '/home/showcase/:id',
+        element: <ShowcaseDetail />,
       },
       {
         path: '/home/quiz',
