@@ -75,7 +75,7 @@ const App = createBrowserRouter([
       },
       {
         path: '/home/canvas',
-        element: <DrawingCanvas />,
+        element: <Canvas />,
       },
     ],
   },
