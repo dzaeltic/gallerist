@@ -48,9 +48,9 @@ function GalleryListItem({ image, users }) {
               <div>
                 Curated by:
                 {' '}
-                {image.userGallery.title}
+                {image.userGallery.name}
               </div>
-              <Button variant="primary" value={image.userGallery.title} onClick={addFriend}>
+              <Button variant="primary" value={image.userGallery.name} onClick={addFriend}>
                 Add Friend
               </Button>
               <WatchItem imgTitle={image.title} isForSale={image.isForSale} users={users} />

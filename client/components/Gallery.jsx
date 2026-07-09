@@ -105,7 +105,7 @@ function Gallery() {
 
   // check num to see what need to be render
   const changeNum = (num) => {
-    if (images.length > number + num && number + num >= 0) {
+    if (memeArray.length > number + num && number + num >= 0) {
       setNumber(number + num);
       getThreeMemes(number + num);
     }
@@ -134,8 +134,11 @@ function Gallery() {
   useEffect(() => {
     getAllImages();
     getAllUsers();
-    getThreeMemes();
   }, []);
+
+  useEffect(() => {
+    getThreeMemes();
+  }, [meme]);
 
   return (
     <Container>
@@ -164,7 +167,7 @@ function Gallery() {
         </Col>
       </Row>
       <Row>
-        {meme === false && images.map((image, i) => (
+        {meme === false && images.filter(Boolean).map((image, i) => (
           <Col key={`${image.imageId}-${i}`}>
             <GalleryListItem
               image={image}
@@ -178,18 +181,14 @@ function Gallery() {
           <button onClick={() => { changeNum(3); }}>{'>'}</button>
         </>
       )}
-      {meme === true && threeMemes.map((image, i) => {
-        if (image !== undefined) {
-          return (
-            <Col key={`${i}`}>
-              <MemeListItem
-                image={image}
-                num={i}
-              />
-            </Col>
-          );
-        }
-      })}
+      {meme === true && threeMemes.filter(Boolean).map((image, i) => (
+        <Col key={`${i}`}>
+          <MemeListItem
+            image={image}
+            num={i}
+          />
+        </Col>
+      ))}
     </Container>
 
   );
