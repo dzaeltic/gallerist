@@ -17,6 +17,10 @@ const UserSchema = new Schema({
   // gallery: Array,
   friends: Array,
   wallet: Number,
+  vouchers: {
+    type: Number,
+    default: 0,
+  },
   quizHighScore: Number,
   quizTotalScore: Number,
 });
