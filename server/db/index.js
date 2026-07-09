@@ -109,6 +109,15 @@ const WatchedSchema = new Schema({
   isWatched: Boolean,
 });
 
+const BlackMarketArtSchema = new Schema({
+  artwork: {
+    type: Schema.Types.ObjectId,
+    ref: 'Artwork',
+  },
+  price: { type: Number, default: 5000 },
+  status: { type: String, default: 'active' },
+});
+
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
@@ -116,7 +125,8 @@ const Showcase = model('Showcase', ShowcaseSchema);
 const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
+const BlackMarketArt = model('BlackMarketArt', BlackMarketArtSchema);
 
 module.exports = {
-  User, Art, Meme, Showcase, Vault, AICart, Watch,
+  User, Art, Meme, Showcase, Vault, AICart, Watch, BlackMarketArt,
 };
