@@ -14,7 +14,7 @@ import Quiz from './quiz/Quiz';
 import MemeMaker from './meme/MemeMaker';
 import ArtHeist from './ArtHeist/ArtHeist';
 import CrackCode from './ArtHeist/CrackCode';
-import DrawingCanvas from './DrawingCanvas';
+import Canvas from './Canvas';
 
 const App = createBrowserRouter([
   {
