@@ -10,6 +10,7 @@ const { authRouter } = require('./routes/auth');
 const { apiRouter } = require('./routes/api');
 const { dbRouter } = require('./routes/database');
 const { MemeRouter } = require('./routes/meme/Meme');
+const { showcaseRouter } = require('./routes/showcase/Showcase');
 const { quizRouter } = require('./routes/quizDBrouter');
 
 require('dotenv').config();
@@ -58,6 +59,9 @@ app.use('/', dbRouter);
 
 // meme Routes
 app.use('/meme', MemeRouter);
+
+// showcase Routes
+app.use('/showcase', showcaseRouter);
 
 // Quiz DB Routes
 app.use('/', quizRouter);

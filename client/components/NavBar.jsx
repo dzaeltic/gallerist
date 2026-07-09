@@ -34,6 +34,9 @@ function NavBar() {
             <Nav.Link as={NavLink} eventKey="auction" to="auction">
               Auction
             </Nav.Link>
+            <Nav.Link as={NavLink} eventKey="showcase" to="showcase">
+              Showcase
+            </Nav.Link>
             <Nav.Link as={NavLink} eventKey="heist" to="heist">
               Heist
             </Nav.Link>
