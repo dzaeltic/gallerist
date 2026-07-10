@@ -17,6 +17,10 @@ const UserSchema = new Schema({
   // gallery: Array,
   friends: Array,
   wallet: Number,
+  vouchers: {
+    type: Number,
+    default: 0,
+  },
   quizHighScore: Number,
   quizTotalScore: Number,
 });
@@ -52,6 +56,24 @@ const MemeSchema = new Schema({
   options: Object,
   user_id: String,
   imageId: String,
+});
+
+const ShowcaseSchema = new Schema({
+  curator: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  curatorName: String,
+  title: String,
+  message: String,
+  musicUrl: String,
+  artPieces: [{
+    type: Schema.Types.ObjectId,
+    ref: 'Art',
+  }],
+  startDate: Date,
+  endDate: Date,
+  auctionDate: Date, // For future expansion
 });
 
 const VaultSchema = new Schema({
@@ -95,13 +117,24 @@ const WatchedSchema = new Schema({
   isWatched: Boolean,
 });
 
+const BlackMarketArtSchema = new Schema({
+  artwork: {
+    type: Schema.Types.ObjectId,
+    ref: 'Artwork',
+  },
+  price: { type: Number, default: 5000 },
+  status: { type: String, default: 'active' },
+});
+
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
+const Showcase = model('Showcase', ShowcaseSchema);
 const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
+const BlackMarketArt = model('BlackMarketArt', BlackMarketArtSchema);
 
 module.exports = {
-  User, Art, Meme, Vault, AICart, Watch,
+  User, Art, Meme, Showcase, Vault, AICart, Watch, BlackMarketArt,
 };

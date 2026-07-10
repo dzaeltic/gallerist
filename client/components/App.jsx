@@ -4,6 +4,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import Login from './Login';
 import Search from './Search';
 import Gallery from './Gallery';
+import BlackMarket from './BlackMarket';
 import NavBar from './NavBar';
 import Auction from './Auction';
 import Profile from './Profile';
@@ -39,6 +40,10 @@ const App = createBrowserRouter([
       {
         path: '/home/profile',
         element: <Profile />,
+      },
+      {
+        path: '/home/blackmarket',
+        element: <BlackMarket />,
       },
       {
         path: '/home/gallery',

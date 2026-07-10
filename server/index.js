@@ -11,6 +11,7 @@ const { apiRouter } = require('./routes/api');
 const { dbRouter } = require('./routes/database');
 const { MemeRouter } = require('./routes/meme/Meme');
 const { quizRouter } = require('./routes/quizDBrouter');
+const blackMarketRouter = require('./routes/blackMarket');
 
 require('dotenv').config();
 
@@ -61,6 +62,9 @@ app.use('/meme', MemeRouter);
 
 // Quiz DB Routes
 app.use('/', quizRouter);
+
+// Black Market routes
+app.use('/db/blackmarket', blackMarketRouter);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
