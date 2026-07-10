@@ -9,7 +9,9 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import WatchItem from './Watch';
 
-function GalleryListItem({ image, users }) {
+import LikeButtons from './social/LikeButtons';
+
+function GalleryListItem({ image, users, getAllImages }) {
   // set up modal for friend request
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
@@ -58,6 +60,12 @@ function GalleryListItem({ image, users }) {
             )}
           </div>
           <Link to={`/home/art/${image.imageId}`}>Click here for more details...</Link>
+          <br />
+          Likes:
+          { image.likes }
+          Dislikes:
+          { image.dislikes }
+          <LikeButtons id={image.imageId} getAllImages={getAllImages} />
           <br />
         </Col>
       </Row>
