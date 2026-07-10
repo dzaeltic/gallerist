@@ -6,6 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import Button from 'react-bootstrap/Button';
 
 function ShowcaseList() {
   const [showcases, setShowcases] = useState([]);
@@ -19,14 +20,15 @@ function ShowcaseList() {
 
   return (
     <Container>
-      <Row>
-        <Col md={9}>
-          <h1>
-            <strong>Showcases</strong>
-          </h1>
+      <Row className="align-items-center mb-4">
+        <Col>
+          <h1 className="mb-1"><strong>Showcases</strong></h1>
+          <p className="text-muted mb-0">Featured exhibitions from the gallery&apos;s top curators.</p>
         </Col>
-        <Col md={3}>
-          <Link to="/home/showcase/setup">My Showcases / Create New</Link>
+        <Col xs="auto">
+          <Button as={Link} to="/home/showcase/setup" variant="dark" size="lg">
+            Create Showcase
+          </Button>
         </Col>
       </Row>
       <Row>

@@ -24,7 +24,7 @@ showcaseRouter.get('/get/:id', (req, res) => {
     res.status(404).json({ error: 'bad id' });
     return;
   }
-  Showcase.fingById(id)
+  Showcase.findById(id)
     .populate('artPieces')
     .then((showcase) => {
       if (showcase) {
