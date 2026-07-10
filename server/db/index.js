@@ -87,13 +87,28 @@ const WatchedSchema = new Schema({
   isWatched: Boolean,
 });
 
+const UserArtSchema = new Schema({
+  imageUrl: {
+    type: String,
+    required: true,
+  },
+  posted: {
+    type: Boolean,
+    default: false,
+  },
+}, { timestamps: true });
+
+UserArtSchema.virtual('id').get(() => this.imageId ?? this._id);
+UserArtSchema.set('toJSON', { virtuals: true });
+
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
 const Vault = model('Vault', VaultSchema);
 const AICart = model('AICart', AIC_Schema);
 const Watch = model('Watch', WatchedSchema);
+const UserArt = Art.discriminator('UserArt', UserArtSchema);
 
 module.exports = {
-  User, Art, Meme, Vault, AICart, Watch,
+  User, Art, Meme, Vault, AICart, Watch, UserArt,
 };
