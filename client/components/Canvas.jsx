@@ -109,16 +109,17 @@ function Canvas() {
           title,
         },
       })
-        .then(fetchDrawings)
+        .then((res) => {
+          setDrawings((prev) => [...prev, res.data]);
+        })
         .catch((err) => console.error('Save failed: ', err));
     } else {
       axios.put(`/db/drawings/${currentDrawing.id}`, {
-        art: {
-          ...currentDrawing,
-          imageUrl,
-        },
+        art: { imageUrl },
       })
-        .then(fetchDrawings)
+        .then((res) => {
+          setDrawings((prev) => prev.map((d) => (d.id === res.data.id ? res.data : d)));
+        })
         .catch((err) => console.log('Save failed: ', err));
     }
   }

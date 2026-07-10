@@ -14,7 +14,7 @@ userArtRouter.post('/db/drawings', (req, res) => {
     artist: name,
     culture: 'User Art',
   })
-    .then(() => res.sendStatus(201))
+    .then((drawing) => res.status(201).json(drawing))
     .catch((err) => {
       console.error('Failed to create user created art document: ', err);
       res.sendStatus(500);
@@ -44,7 +44,7 @@ userArtRouter.put('/db/drawings/:id', (req, res) => {
 
       Object.assign(doc, art);
       return doc.save()
-        .then(() => res.sendStatus(204));
+        .then((drawing) => res.status(200).json(drawing));
     })
     .catch((err) => {
       console.error('Failed to update user created art document: ', err);
