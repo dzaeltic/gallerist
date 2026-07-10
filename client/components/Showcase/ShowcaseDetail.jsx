@@ -42,10 +42,10 @@ function ShowcaseDetail() {
                 alt={art.title}
                 style={{ maxHeight: '500px', objectFit: 'contain' }}
               />
-              <Carousel.Caption>
-                <h5>{art.title}</h5>
-                <p>{art.artist}</p>
-              </Carousel.Caption>
+              <div className="text-center py-2">
+                <h5 className="mb-0">{art.title}</h5>
+                <p className="mb-0 text-muted">{art.artist}</p>
+              </div>
             </Carousel.Item>
           ))}
         </Carousel>
