@@ -13,6 +13,9 @@ import PhotoInfo from './PhotoInfo';
 import PalGallery from './PalGallery';
 import Quiz from './quiz/Quiz';
 import MemeMaker from './meme/MemeMaker';
+import ShowcaseList from './Showcase/ShowcaseList';
+import ShowcaseDetail from './Showcase/ShowcaseDetail';
+import ShowcaseSetup from './Showcase/ShowcaseSetup';
 import ArtHeist from './ArtHeist/ArtHeist';
 import CrackCode from './ArtHeist/CrackCode';
 
@@ -56,6 +59,18 @@ const App = createBrowserRouter([
       {
         path: '/home/auction',
         element: <Auction />,
+      },
+      {
+        path: '/home/showcase',
+        element: <ShowcaseList />,
+      },
+      {
+        path: '/home/showcase/setup',
+        element: <ShowcaseSetup />,
+      },
+      {
+        path: '/home/showcase/:id',
+        element: <ShowcaseDetail />,
       },
       {
         path: '/home/quiz',

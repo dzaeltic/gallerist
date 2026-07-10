@@ -3,6 +3,7 @@ const findOrCreate = require('mongoose-findorcreate');
 require('dotenv').config();
 
 const { Schema, model } = mongoose;
+// eslint-disable-next-line camelcase
 const db_uri = process.env.DB_URI;
 
 mongoose
@@ -84,6 +85,7 @@ const VaultSchema = new Schema({
   }],
 });
 
+// eslint-disable-next-line camelcase
 const AIC_Schema = new Schema({
   id: { type: Number, required: true },
   image_id: { type: String, required: true },
