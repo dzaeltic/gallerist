@@ -5,8 +5,6 @@ import Image from 'react-bootstrap/Image';
 import Col from 'react-bootstrap/Col';
 import Modal from 'react-bootstrap/Modal';
 
-import LikeButtons from './social/LikeButtons';
-
 function SearchItem({ image, idSearch }) {
   // modal state variable
   const [lgShow, setLgShow] = useState(false);
@@ -44,13 +42,8 @@ function SearchItem({ image, idSearch }) {
         }}
         style={{ paddingBottom: '20px' }}
       >
-        ❤️
+        💲BUY💲
       </Button>
-      Likes:
-      { image.likes }
-      Dislikes:
-      { image.dislikes }
-      <LikeButtons id={image.id} />
     </Col>
   );
 }
