@@ -111,17 +111,18 @@ function BlackMarket() {
                   borderBottom: 'none',
                 }}
               >
-                {item.itemType === 'voucher' ? 'Mysterious Voucher' : 'Mystery Art'}
+                Mystery Art
               </h5>
 
               <div className="p-3" style={{ border: '3px solid #00d2ff', backgroundColor: '#000' }}>
                 <div className="bg-dark mb-3" style={{ height: '250px', overflow: 'hidden', position: 'relative' }}>
                   <img
-                    src={item.imageUrl || item.url || 'https://via.placeholder.com/250'}
+                    src={
+                      item.itemType === 'voucher'
+                        ? 'https://i.postimg.cc/ZK71b1QY/voucher-square.jpg'
+                        : (item.imageUrl || item.url)
+                    }
                     alt={item.title || 'Market Item'}
-                    onError={(e) => {
-                      e.target.src = 'https://via.placeholder.com/250';
-                    }}
                     style={{
                       width: '100%',
                       height: '100%',
