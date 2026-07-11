@@ -31,11 +31,11 @@ function Search() {
     axios.post('/db/art', {
       art: {
         title: artObj.title,
-        artist: artObj.people[0].displayname,
+        artist: artObj.people?.[0].displayname || 'unknown',
         date: artObj.dated,
         culture: artObj.culture,
         url: artObj.url,
-        imageUrl: artObj.images[0].baseimageurl,
+        imageUrl: artObj.images[0]?.baseimageurl || artObj.primaryimageurl,
         isForSale: false,
         price: 0,
       },
