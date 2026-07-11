@@ -27,7 +27,7 @@ function Search() {
   const handleShow = () => setShow(true);
 
   // axios post request to user's gallery
-  function postToGallery(artObj) {
+  function postToGallery(artObj, imageUrl) {
     axios.post('/db/art', {
       art: {
         title: artObj.title,
@@ -35,7 +35,7 @@ function Search() {
         date: artObj.dated,
         culture: artObj.culture,
         url: artObj.url,
-        imageUrl: artObj.images[0]?.baseimageurl || artObj.primaryimageurl,
+        imageUrl,
         isForSale: false,
         price: 0,
       },
@@ -73,11 +73,18 @@ function Search() {
     axios(`/huam/object/${id}`)
       .then(({ data }) => {
         console.log(data);
-        if (data[0].images.length === 0) {
-          setMessage('Sorry this piece is no longer available');
+        const artObj = data[0];
+        const imageUrl = artObj.images?.[0]?.baseimageurl
+          || artObj.primaryimageurl
+          || artObj.baseimageurl;
+
+        if (!imageUrl) {
+          setMessage('Sorry, this piece has no image available');
           handleShow();
+          return;
         }
-        return postToGallery(data[0]);
+
+        return postToGallery(artObj, imageUrl);
       })
       .catch((err) => console.error(err));
   }

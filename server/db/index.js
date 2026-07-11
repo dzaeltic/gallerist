@@ -131,11 +131,6 @@ const UserArtSchema = new Schema({
   },
 });
 
-UserArtSchema.virtual('id').get(function () {
-  return this.imageId ?? this._id;
-});
-UserArtSchema.set('toJSON', { virtuals: true });
-
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
 const Meme = model('Meme', MemeSchema);
