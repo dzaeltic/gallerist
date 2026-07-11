@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Container from 'react-bootstrap/Container';
@@ -12,6 +12,8 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 
 function Profile() {
+  const navigate = useNavigate();
+
   // Initialize three main parts of profile page
   const [name, setName] = useState('');
   const [friends, setFriends] = useState([]);
@@ -19,6 +21,9 @@ function Profile() {
 
   // used to set array of all art documents associated with user
   const [gallery, setGallery] = useState([]);
+
+  // used to set array of all showcases (drafts and active) belonging to user
+  const [myShowcases, setMyShowcases] = useState([]);
 
   // Price setting modal
   const [show, setShow] = useState(false);
@@ -53,10 +58,21 @@ function Profile() {
       .catch((err) => console.error('Could not Get art by user: ', err));
   }
 
+  // GET request to return all showcases (draft + active) belonging to User
+  function getMyShowcases() {
+    return axios
+      .get('/showcase/mine')
+      .then(({ data }) => {
+        setMyShowcases(data);
+      })
+      .catch((err) => console.error('Could not GET my showcases: ', err));
+  }
+
   // Initializing state on first render
   useEffect(() => {
     getProfile();
     getUserGallery();
+    getMyShowcases();
   }, []);
 
   // State for price setting feature
@@ -145,6 +161,30 @@ function Profile() {
       })
       .then(() => getProfile())
       .catch((err) => console.error('Could not get paid by Artie McBuyer: ', err));
+  }
+
+  // Navigate to Showcase Studio with the showcase preloaded for editing
+  function editShowcase(showcase) {
+    navigate('/home/showcase/setup', { state: { showcase } });
+  }
+
+  // Flip a draft showcase to published
+  function publishShowcase(id) {
+    axios
+      .patch(`/showcase/update/${id}`, { isDraft: false })
+      .then(() => getMyShowcases())
+      .catch((err) => console.error('Could not publish showcase: ', err));
+  }
+  // Delete a showcase, draft or active
+  function deleteShowcase(id, title) {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(`Delete "${title}"? This can't be undone.`)) {
+      return;
+    }
+    axios
+      .delete(`/showcase/delete/${id}`)
+      .then(() => getMyShowcases())
+      .catch((err) => console.error('Could not DELETE showcase: ', err));
   }
 
   // Iterate over friends array, could be improved by linking to friend's gallery perhaps
@@ -286,6 +326,114 @@ function Profile() {
     </ListGroup>
   );
 
+  // Iterates over myShowcases, splitting into Draft/Active accordion groups
+  // Drafts get Edit/Publish/Delete; Active (published) get Edit/Delete plus a link to view
+  const showcasesDiv = myShowcases.length ? (
+    <Accordion defaultActiveKey="0">
+      <Accordion.Item eventKey="0">
+        <Accordion.Header>Draft Showcases:</Accordion.Header>
+        <Accordion.Body>
+          <ListGroup>
+            {myShowcases.filter((showcase) => showcase.isDraft).length ? (
+              myShowcases
+                .filter((showcase) => showcase.isDraft)
+                .map((showcase) => (
+                  <ListGroup.Item key={showcase._id}>
+                    <Container>
+                      <Row>
+                        <Col sm="7">
+                          <strong>
+                            {showcase.title || 'Untitled Showcase'}
+                          </strong>
+                        </Col>
+                        <Col sm="2">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => editShowcase(showcase)}
+                          >
+                            Edit
+                          </Button>
+                        </Col>
+                        <Col sm="2">
+                          <Button
+                            variant="outline-success"
+                            size="sm"
+                            onClick={() => publishShowcase(showcase._id)}
+                          >
+                            Publish
+                          </Button>
+                        </Col>
+                        <Col sm="1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteShowcase(showcase._id, showcase.title)}
+                          >
+                            ❌
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Container>
+                  </ListGroup.Item>
+                ))
+            ) : (
+              <ListGroup.Item>No draft showcases.</ListGroup.Item>
+            )}
+          </ListGroup>
+        </Accordion.Body>
+      </Accordion.Item>
+      <Accordion.Item eventKey="1">
+        <Accordion.Header>Active Showcases:</Accordion.Header>
+        <Accordion.Body>
+          <ListGroup>
+            {myShowcases.filter((showcase) => !showcase.isDraft).length ? (
+              myShowcases
+                .filter((showcase) => !showcase.isDraft)
+                .map((showcase) => (
+                  <ListGroup.Item key={showcase._id}>
+                    <Container>
+                      <Row>
+                        <Col sm="8">
+                          <Link to={`/home/showcase/${showcase._id}`}>
+                            <strong>{showcase.title}</strong>
+                          </Link>
+                        </Col>
+                        <Col sm="2">
+                          <Button
+                            variant="outline-primary"
+                            size="sm"
+                            onClick={() => editShowcase(showcase)}
+                          >
+                            Edit
+                          </Button>
+                        </Col>
+                        <Col sm="2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => deleteShowcase(showcase._id, showcase.title)}
+                          >
+                            ❌
+                          </Button>
+                        </Col>
+                      </Row>
+                    </Container>
+                  </ListGroup.Item>
+                ))
+            ) : (
+              <ListGroup.Item>No active showcases.</ListGroup.Item>
+            )}
+          </ListGroup>
+        </Accordion.Body>
+      </Accordion.Item>
+    </Accordion>
+  ) : (
+    <ListGroup>
+      <ListGroup.Item>You have no showcases yet.</ListGroup.Item>
+    </ListGroup>
+  );
+
   return (
     <Container>
       <Row>
@@ -310,6 +458,12 @@ function Profile() {
         <Container>
           <h3>Gallery:</h3>
           {artDiv}
+        </Container>
+      </Row>
+      <Row>
+        <Container>
+          <h3>Showcases:</h3>
+          {showcasesDiv}
         </Container>
       </Row>
 

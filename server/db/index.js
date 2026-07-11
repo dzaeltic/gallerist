@@ -61,9 +61,14 @@ const ShowcaseSchema = new Schema({
     ref: 'User',
   },
   curatorName: String,
+  isDraft: {
+    type: Boolean,
+    default: true,
+  },
   title: String,
   message: String,
-  musicUrl: String,
+  playlist: [String],
+  shuffle: Boolean,
   artPieces: [{
     type: Schema.Types.ObjectId,
     ref: 'Art',

@@ -9,6 +9,8 @@ import Carousel from 'react-bootstrap/Carousel';
 function ShowcaseDetail() {
   const { id } = useParams();
   const [showcase, setShowcase] = useState(null);
+  const [playOrder, setPlayOrder] = useState([]);
+  const [trackIndex, setTrackIndex] = useState(0);
 
   useEffect(() => {
     axios
@@ -16,6 +18,26 @@ function ShowcaseDetail() {
       .then(({ data }) => setShowcase(data))
       .catch((err) => console.error('Could not GET showcase: ', err));
   }, [id]);
+
+  useEffect(() => {
+    if (!showcase) return;
+    const tracks = showcase.playlist || [];
+    if (showcase.shuffle) {
+      const shuffled = [...tracks];
+      for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      setPlayOrder(shuffled);
+    } else {
+      setPlayOrder(tracks);
+    }
+    setTrackIndex(0);
+  }, [showcase]);
+
+  function handleTrackEnded() {
+    setTrackIndex((prev) => (prev + 1) % playOrder.length);
+  }
 
   if (!showcase) {
     return (
@@ -50,11 +72,20 @@ function ShowcaseDetail() {
           ))}
         </Carousel>
       </Row>
-      {showcase.musicUrl && (
+      {playOrder.length > 0 && (
         <Row className="mt-3">
-          <audio controls src={showcase.musicUrl}>
+          <audio
+            key={trackIndex}
+            controls
+            autoPlay
+            src={playOrder[trackIndex]}
+            onEnded={handleTrackEnded}
+          >
             <track kind="captions" />
           </audio>
+          <p className="text-muted mt-1">
+            {`Now playing track ${trackIndex + 1} of ${playOrder.length}${showcase.shuffle ? ' (shuffled)' : ''}`}
+          </p>
         </Row>
       )}
     </Container>

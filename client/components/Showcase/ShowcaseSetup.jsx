@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 import Container from 'react-bootstrap/Container';
@@ -24,75 +25,97 @@ const TRACKS = [
 ];
 
 function ShowcaseSetup() {
-  const [myShowcases, setMyShowcases] = useState([]);
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [myArt, setMyArt] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [musicUrl, setMusicUrl] = useState('');
+  const [playlist, setPlaylist] = useState([]);
+  const [shuffle, setShuffle] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [auctionDate, setAuctionDate] = useState('');
   const [artPieces, setArtPieces] = useState([]);
 
-  function getMine() {
-    axios
-      .get('/showcase/mine')
-      .then(({ data }) => setMyShowcases(data))
-      .catch((err) => console.error('Could not GET my showcases: ', err));
+  function loadForEdit(showcase) {
+    setEditingId(showcase._id);
+    setTitle(showcase.title || '');
+    setMessage(showcase.message || '');
+    setPlaylist(showcase.playlist || []);
+    setShuffle(!!showcase.shuffle);
+    setStartDate(showcase.startDate ? showcase.startDate.slice(0, 10) : '');
+    setEndDate(showcase.endDate ? showcase.endDate.slice(0, 10) : '');
+    setAuctionDate(
+      showcase.auctionDate ? showcase.auctionDate.slice(0, 10) : '',
+    );
+    setArtPieces(
+      (showcase.artPieces || []).map((art) => (typeof art === 'string' ? art : art._id)),
+    );
   }
 
   useEffect(() => {
-    getMine();
     axios
       .get('/db/userArt/')
       .then(({ data }) => setMyArt(data))
       .catch((err) => console.error('Could not GET my art: ', err));
+
+    if (location.state?.showcase) {
+      loadForEdit(location.state.showcase);
+    }
   }, []);
 
   function resetForm() {
     setEditingId(null);
     setTitle('');
     setMessage('');
-    setMusicUrl('');
+    setPlaylist([]);
+    setShuffle(false);
     setStartDate('');
     setEndDate('');
     setAuctionDate('');
     setArtPieces([]);
   }
 
-  function loadForEdit(showcase) {
-    setEditingId(showcase._id);
-    setTitle(showcase.title || '');
-    setMessage(showcase.message || '');
-    setMusicUrl(showcase.musicUrl || '');
-    setStartDate(showcase.startDate ? showcase.startDate.slice(0, 10) : '');
-    setEndDate(showcase.endDate ? showcase.endDate.slice(0, 10) : '');
-    setAuctionDate(
-      showcase.auctionDate ? showcase.auctionDate.slice(0, 10) : '',
-    );
-    setArtPieces(showcase.artPieces || []);
-  }
-
   function toggleArt(artId) {
-    setArtPieces((prev) =>
-      prev.includes(artId)
-        ? prev.filter((id) => id !== artId)
-        : [...prev, artId],
-    );
+    setArtPieces((prev) => (prev.includes(artId)
+      ? prev.filter((id) => id !== artId)
+      : [...prev, artId]));
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  function togglePlaylistTrack(value) {
+    setPlaylist((prev) => (prev.includes(value)
+      ? prev.filter((v) => v !== value)
+      : [...prev, value]));
+  }
+
+  function moveTrack(index, direction) {
+    setPlaylist((prev) => {
+      const next = [...prev];
+      const target = index + direction;
+      if (target < 0 || target >= next.length) return prev;
+      [next[index], next[target]] = [next[target], next[index]];
+      return next;
+    });
+  }
+
+  function removeTrack(value) {
+    setPlaylist((prev) => prev.filter((v) => v !== value));
+  }
+
+  function handleSave(isDraft) {
     const payload = {
       title,
       message,
-      musicUrl,
+      playlist,
+      shuffle,
       startDate,
       endDate,
       auctionDate,
       artPieces,
+      isDraft,
     };
 
     const request = editingId
@@ -100,21 +123,15 @@ function ShowcaseSetup() {
       : axios.post('/showcase/create', payload);
 
     request
-      .then(() => {
-        resetForm();
-        getMine();
+      .then(({ data }) => {
+        navigate(isDraft ? '/home/profile' : `/home/showcase/${data._id}`);
       })
       .catch((err) => console.error('Could not save showcase: ', err));
   }
 
-  function handleDelete(id) {
-    axios
-      .delete(`/showcase/delete/${id}`)
-      .then(() => {
-        if (editingId === id) resetForm();
-        getMine();
-      })
-      .catch((err) => console.error('Could not DELETE showcase: ', err));
+  function handleSubmit(event) {
+    event.preventDefault();
+    handleSave(false);
   }
 
   return (
@@ -125,47 +142,12 @@ function ShowcaseSetup() {
             <strong>Showcase Studio</strong>
           </h1>
           <p className="text-muted mb-0">
-            Manage your existing showcases or curate a new one.
+            {editingId
+              ? 'Update the details of your showcase.'
+              : 'Curate a new showcase from your gallery.'}
           </p>
         </Col>
       </Row>
-
-      <Card className="mb-4">
-        <Card.Header as="h5">My Showcases</Card.Header>
-        <ListGroup variant="flush">
-          {myShowcases.length ? (
-            myShowcases.map((showcase) => (
-              <ListGroup.Item key={showcase._id}>
-                <Row className="align-items-center">
-                  <Col sm={8}>{showcase.title}</Col>
-                  <Col sm={2}>
-                    <Button
-                      variant="outline-primary"
-                      size="sm"
-                      onClick={() => loadForEdit(showcase)}
-                    >
-                      Edit
-                    </Button>
-                  </Col>
-                  <Col sm={2}>
-                    <Button
-                      variant="outline-danger"
-                      size="sm"
-                      onClick={() => handleDelete(showcase._id)}
-                    >
-                      Delete
-                    </Button>
-                  </Col>
-                </Row>
-              </ListGroup.Item>
-            ))
-          ) : (
-            <ListGroup.Item className="text-muted">
-              You have no showcases yet. Create your first one below!
-            </ListGroup.Item>
-          )}
-        </ListGroup>
-      </Card>
 
       <Card>
         <Card.Header as="h5">
@@ -189,20 +171,76 @@ function ShowcaseSetup() {
                 onChange={(e) => setMessage(e.target.value)}
               />
             </Form.Group>
+
             <Form.Group className="mb-3">
-              <Form.Label>Music</Form.Label>
-              <Form.Select
-                value={musicUrl}
-                onChange={(e) => setMusicUrl(e.target.value)}
-              >
-                <option value="">No Music</option>
-                {TRACKS.map((track) => (
-                  <option key={track.value} value={track.value}>
-                    {track.label}
-                  </option>
-                ))}
-              </Form.Select>
+              <Form.Label>Add Tracks</Form.Label>
+              {TRACKS.map((track) => (
+                <Form.Check
+                  key={track.value}
+                  type="checkbox"
+                  label={track.label}
+                  checked={playlist.includes(track.value)}
+                  onChange={() => togglePlaylistTrack(track.value)}
+                />
+              ))}
             </Form.Group>
+
+            {playlist.length > 0 && (
+              <Form.Group className="mb-3">
+                <Form.Label>Playback Order</Form.Label>
+                <ListGroup>
+                  {playlist.map((value, index) => {
+                    const track = TRACKS.find((t) => t.value === value);
+                    return (
+                      <ListGroup.Item
+                        key={value}
+                        className="d-flex justify-content-between align-items-center"
+                      >
+                        <span>{`${index + 1}. ${track ? track.label : value}`}</span>
+                        <div>
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="me-1"
+                            disabled={index === 0}
+                            onClick={() => moveTrack(index, -1)}
+                          >
+                            {'\u2191'}
+                          </Button>
+                          <Button
+                            variant="outline-secondary"
+                            size="sm"
+                            className="me-1"
+                            disabled={index === playlist.length - 1}
+                            onClick={() => moveTrack(index, 1)}
+                          >
+                            {'\u2193'}
+                          </Button>
+                          <Button
+                            variant="outline-danger"
+                            size="sm"
+                            onClick={() => removeTrack(value)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </ListGroup.Item>
+                    );
+                  })}
+                </ListGroup>
+              </Form.Group>
+            )}
+
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="switch"
+                id="shuffle-switch"
+                label="Play in random order"
+                checked={shuffle}
+                onChange={(e) => setShuffle(e.target.checked)}
+              />
+            </Form.Group>
+
             <Row>
               <Col>
                 <Form.Group className="mb-3">
@@ -224,7 +262,13 @@ function ShowcaseSetup() {
                   />
                 </Form.Group>
               </Col>
-              <Col>
+              {/* - Auction Date input intentionally hidden.
+                  - auctionDate is still tracked in:
+                    state, loadForEdit, resetForm, and the save payload.
+                  - A future cohort can pick up the 'exclusive auctions' feature
+                  from documentation by uncommenting this Col and
+                  building the auction logic around it. */}
+              {/* <Col>
                 <Form.Group className="mb-3">
                   <Form.Label>Auction Date</Form.Label>
                   <Form.Control
@@ -233,7 +277,7 @@ function ShowcaseSetup() {
                     onChange={(e) => setAuctionDate(e.target.value)}
                   />
                 </Form.Group>
-              </Col>
+              </Col> */}
             </Row>
 
             <Form.Group className="mb-3">
@@ -249,8 +293,15 @@ function ShowcaseSetup() {
               ))}
             </Form.Group>
 
-            <Button variant="primary" type="submit">
-              {editingId ? 'Save Changes' : 'Create Showcase'}
+            <Button
+              variant="outline-secondary"
+              type="button"
+              onClick={() => handleSave(true)}
+            >
+              Save Draft
+            </Button>
+            <Button variant="primary" type="submit" className="ms-2">
+              Publish
             </Button>
             {editingId && (
               <Button variant="secondary" className="ms-2" onClick={resetForm}>

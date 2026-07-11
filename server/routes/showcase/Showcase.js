@@ -5,9 +5,9 @@ const showcaseRouter = express.Router();
 
 const { Showcase } = require('../../db/index');
 
-// READ: all showcases, for the homepage/browse list (title, curator, dates)
+// READ: all published showcases, for the public browse list (drafts stay hidden)
 showcaseRouter.get('/get', (req, res) => {
-  Showcase.find({})
+  Showcase.find({ isDraft: false })
     .then((showcases) => {
       res.status(200).send(showcases);
     })
@@ -39,7 +39,8 @@ showcaseRouter.get('/get/:id', (req, res) => {
     });
 });
 
-// READ: showcases belonging to the logged-in user, for their setup/edit list
+// READ: showcases belonging to the logged-in user, drafts and active both
+// (this feeds the Profile management view)
 showcaseRouter.get('/mine', (req, res) => {
   const { _id } = req.user.doc;
   Showcase.find({ curator: _id })
@@ -52,17 +53,19 @@ showcaseRouter.get('/mine', (req, res) => {
     });
 });
 
-// CREATE: new showcase draft
+// CREATE: new showcase, draft or published depending on isDraft
 showcaseRouter.post('/create', (req, res) => {
   const { _id, name } = req.user.doc;
   const {
     title,
     message,
-    musicUrl,
+    playlist,
+    shuffle,
     artPieces,
     startDate,
     endDate,
     auctionDate,
+    isDraft,
   } = req.body;
 
   Showcase.create({
@@ -70,11 +73,13 @@ showcaseRouter.post('/create', (req, res) => {
     curatorName: name,
     title,
     message,
-    musicUrl,
+    playlist,
+    shuffle,
     artPieces,
     startDate,
     endDate,
     auctionDate,
+    isDraft,
   })
     .then((newShowcase) => {
       res.status(201).send(newShowcase);
@@ -85,7 +90,7 @@ showcaseRouter.post('/create', (req, res) => {
     });
 });
 
-// UPDATE: edit draft fields / add-remove art pieces
+// UPDATE: edit fields / add-remove art pieces / toggle isDraft (curator only)
 showcaseRouter.patch('/update/:id', (req, res) => {
   const { id } = req.params;
   const { _id } = req.user.doc;
