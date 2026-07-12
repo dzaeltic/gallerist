@@ -79,7 +79,7 @@ dbRouter.put('/db/deductWallet/', (req, res) => {
 
 // GETs all Art documents from Art table in database
 dbRouter.get('/db/art/', (req, res) => {
-  Art.find({})
+  Art.find({ ownerId: { $ne: 'black_market' } })
     .then((docs) => {
       res.status(200).send(docs);
     })
@@ -197,7 +197,7 @@ dbRouter.put('/db/art/:_id', (req, res) => {
 // Delete request to remove Art object's from gallery
 dbRouter.delete('/db/art/:_id', (req, res) => {
   const { _id } = req.params;
-  Art.findOneAndDelete(_id)
+  Art.findByIdAndDelete(_id)
     .then((deleteObj) => {
       if (deleteObj) {
         res.sendStatus(200);
@@ -277,19 +277,26 @@ dbRouter.get('/db/auction/', (req, res) => {
 // ART Routes: create() via a Post needs to come once we have the full art obj
 // POST '/db/art/ ==> req.body will contain fields corresponding to Art Schema
 dbRouter.post('/db/art', (req, res) => {
-  // destructure relevant user info from request
   const { name, googleId } = req.user.doc;
   const { art } = req.body;
 
-  // Spread contents of art object from req.body into document creation object,
-  // along with userGallery field to associate with user that is curating this artwork
-  Art.create({ ...art, userGallery: { name, googleId } })
+  // check if this specific piece already exists in the database
+  Art.findOne({ url: art.url })
+    .then((existingArt) => {
+      if (existingArt) {
+        // if it exists, just update the owner instead of making a duplicate
+        return Art.findByIdAndUpdate(existingArt._id, {
+          userGallery: { name, googleId }
+        });
+      }
+      // if it does not exist- create it
+      return Art.create({ ...art, userGallery: { name, googleId } });
+    })
     .then(() => {
-      // send 201 status in response
       res.sendStatus(201);
     })
     .catch((err) => {
-      console.error('Failed to create Art document: ', err);
+      console.error('Failed to process Art document: ', err);
       res.sendStatus(500);
     });
 });
