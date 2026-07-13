@@ -79,11 +79,7 @@ function GalleryListItem({ image, users, getAllImages }) {
           </div>
           <Link to={`/home/art/${image._id}`}>Click here for more details...</Link>
           <br />
-          Likes:
-          { image.likes }
-          Dislikes:
-          { image.dislikes }
-          <LikeButtons id={image._id} getAllImages={getAllImages} />
+          <LikeButtons image={image} getAllImages={getAllImages} />
           <br />
         </Col>
       </Row>

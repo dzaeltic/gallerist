@@ -1,7 +1,8 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
 import axios from 'axios';
 
-function LikeButtons({ id, getAllImages }) {
+function LikeButtons({ image, getAllImages }) {
   const updateLikes = ({ target }) => {
     const updObj = {
       likeInfo: {
@@ -11,7 +12,7 @@ function LikeButtons({ id, getAllImages }) {
     };
 
     axios
-      .patch(`/social/likes/art/${id}`, updObj)
+      .patch(`/social/likes/art/${image._id}`, updObj)
       .then(getAllImages)
       .catch((err) => {
         console.error('Error patching art in database!:', err);
@@ -20,8 +21,20 @@ function LikeButtons({ id, getAllImages }) {
 
   return (
     <div>
-      <button type="button" value="like" onClick={updateLikes}>Like</button>
-      <button type="button" value="dislike" onClick={updateLikes}>Dislike</button>
+      <Button
+        variant="outline-dark"
+        value="like"
+        onClick={updateLikes}
+      >
+        { `👍 ${image.likes}` }
+      </Button>
+      <Button
+        variant="outline-dark"
+        value="dislike"
+        onClick={updateLikes}
+      >
+        { `👎 ${image.dislikes}` }
+      </Button>
     </div>
   );
 }
