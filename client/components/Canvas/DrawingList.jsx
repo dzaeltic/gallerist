@@ -6,6 +6,22 @@ import React from 'react';
 function DrawingList({ drawings, currentDrawing, loadDrawing }) {
   return (
     <Row xs={2} sm={4} lg={6} className="g-3 p-2">
+      <Col>
+        <div
+          onClick={() => loadDrawing(null)}
+          style={{
+            border: !currentDrawing ? '3px solid #0d6efd' : '1px dashed #999',
+            borderRadius: '6px',
+            height: '120px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <div className="small text-center">New Drawing</div>
+        </div>
+      </Col>
       {drawings.map((d) => (
         <Col key={d._id}>
           <div
@@ -14,7 +30,7 @@ function DrawingList({ drawings, currentDrawing, loadDrawing }) {
               border: currentDrawing?._id === d._id ? '3px solid #0d6efd' : '1px solid #ccc',
               borderRadius: '6px',
               overflow: 'hidden',
-              cursor: 'poniter',
+              cursor: 'pointer',
             }}
           >
             <Image

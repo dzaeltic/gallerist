@@ -116,17 +116,23 @@ function Canvas() {
       })
         .then((res) => {
           setDrawings((prev) => [...prev, res.data]);
+          setCurrentDrawing(res.data);
         })
         .catch((err) => console.error('Save failed: ', err));
     } else {
-      axios.put(`/db/drawings/${currentDrawing.id}`, {
-        art: { imageUrl },
+      axios.put(`/db/drawings/${currentDrawing._id}`, {
+        art: {
+          imageUrl,
+          title,
+        },
       })
         .then((res) => {
           setDrawings((prev) => prev.map((d) => (d._id === res.data._id ? res.data : d)));
+          setCurrentDrawing(res.data);
         })
         .catch((err) => console.log('Save failed: ', err));
     }
+    setTitle('');
   }
 
   function loadDrawing(id) {
@@ -137,6 +143,8 @@ function Canvas() {
     if (!drawing) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       setCurrentDrawing(null);
+      undoHistory.current = [];
+      redoHistory.current = [];
       return;
     }
 
@@ -144,7 +152,11 @@ function Canvas() {
     const img = new Image();
     img.src = drawing.imageUrl;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      undoHistory.current = [drawing.imageUrl];
+      redoHistory.current = [];
+    };
   }
 
   function getScaledPoint(e) {
