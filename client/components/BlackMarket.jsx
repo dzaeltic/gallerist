@@ -116,7 +116,7 @@ function BlackMarket() {
 
         setListings((prev) => prev.map((item) => updatedById[item._id] || item));
         setHagglesMade((prev) => prev + 1);
-        setHaggleStatus(res.success ? ' (Success!)' : ' (Failed!)');
+        setHaggleStatus(res.data.success ? ' (Success!)' : ' (Failed!)');
       })
       .catch((err) => {
         console.error(err);

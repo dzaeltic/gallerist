@@ -103,7 +103,6 @@ blackMarketRouter.patch('/db/blackmarket/voucher', (req, res) => {
 blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
   const { listingIds, vouchers } = req.body;
 
-  // Allow the request if at least one type of item is present
   if ((!listingIds || listingIds.length === 0) && (!vouchers || vouchers.length === 0)) {
     return res.sendStatus(400);
   }
@@ -114,7 +113,7 @@ blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
   // on fail = 125% of cost, +25% increase
   const multiplier = isSuccess ? 0.75 : 1.25;
 
-  // Handle DB items
+  // handle DB items
   const artPromise = listingIds && listingIds.length > 0
     ? BlackMarketArt.find({ _id: { $in: listingIds } })
       .then((listings) => Promise.all(listings.map((listing) => {
@@ -124,7 +123,7 @@ blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
     : Promise.resolve([]);
 
   artPromise.then((updatedListings) => {
-    // Handle Vouchers in-memory
+    // handle vouchers in-memory
     const updatedVouchers = (vouchers || []).map((v) => ({
       ...v,
       price: Math.max(10, Math.floor(v.price * multiplier))
