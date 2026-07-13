@@ -57,12 +57,13 @@ function BlackMarket() {
 
   const handleBuy = (id) => {
     const purchasedItem = listings.find((item) => item._id === id);
+    if (!purchasedItem) return;
 
-    axios.delete(`/db/blackmarket/buy/${id}`)
+    axios.delete(`/db/blackmarket/buy/${id}`, { data: { price: purchasedItem.price } })
       .then(() => {
         setHagglesMade(0);
         setHaggleStatus('');
-        if (purchasedItem) setRevealItem(purchasedItem);
+        setRevealItem(purchasedItem);
         fetchData();
       })
       .catch((err) => console.error(err));
@@ -94,18 +95,28 @@ function BlackMarket() {
   };
 
   const handleAttemptHaggle = () => {
-    const listingIds = listings.map((item) => item._id);
-    if (listingIds.length === 0) return;
+    if (listings.length === 0) return;
 
-    axios.patch('/db/blackmarket/haggle', { listingIds })
+    const artListingIds = listings
+      .filter((item) => item.itemType !== 'voucher')
+      .map((item) => item._id);
+
+    const vouchersList = listings.filter((item) => item.itemType === 'voucher');
+
+    axios.patch('/db/blackmarket/haggle', {
+      listingIds: artListingIds,
+      vouchers: vouchersList,
+    })
       .then((res) => {
+        const updatedListings = [...res.data.listings, ...res.data.vouchers];
         const updatedById = {};
-        res.data.listings.forEach((updated) => {
+        updatedListings.forEach((updated) => {
           updatedById[updated._id] = updated;
         });
+
         setListings((prev) => prev.map((item) => updatedById[item._id] || item));
         setHagglesMade((prev) => prev + 1);
-        setHaggleStatus(res.data.success ? ' (Success!)' : ' (Failed!)');
+        setHaggleStatus(res.success ? ' (Success!)' : ' (Failed!)');
       })
       .catch((err) => {
         console.error(err);

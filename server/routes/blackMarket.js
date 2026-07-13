@@ -100,15 +100,13 @@ blackMarketRouter.patch('/db/blackmarket/voucher', (req, res) => {
 });
 
 // PATCH route that allows a user to haggle
-// after each haggle the price will increase or decrease depending on success or fail
 blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
-  const { listingIds } = req.body;
+  const { listingIds, vouchers } = req.body;
 
-  if (!listingIds || !listingIds.length) {
+  // Allow the request if at least one type of item is present
+  if ((!listingIds || listingIds.length === 0) && (!vouchers || vouchers.length === 0)) {
     return res.sendStatus(400);
   }
-
-  const artListingIds = listingIds.filter((id) => !id.startsWith('voucher_'));
 
   // 50/50 chance for success or failure
   const isSuccess = Math.random() >= 0.5;
@@ -116,33 +114,27 @@ blackMarketRouter.patch('/db/blackmarket/haggle', (req, res) => {
   // on fail = 125% of cost, +25% increase
   const multiplier = isSuccess ? 0.75 : 1.25;
 
-  return BlackMarketArt.find({ _id: { $in: artListingIds } })
-    .then((listings) => {
-      const updatePromises = listings.map((listing) => {
-        // use default 5000 if price isn't set yet
-        const currentPrice = listing.price || 5000;
-        let newPrice = Math.floor(currentPrice * multiplier);
-        // lowest discount can go is to $10
-        if (newPrice < 10) newPrice = 10;
+  // Handle DB items
+  const artPromise = listingIds && listingIds.length > 0
+    ? BlackMarketArt.find({ _id: { $in: listingIds } })
+      .then((listings) => Promise.all(listings.map((listing) => {
+        let newPrice = Math.max(10, Math.floor((listing.price || 5000) * multiplier));
+        return BlackMarketArt.findByIdAndUpdate(listing._id, { price: newPrice, $inc: { haggleCount: 1 } }, { new: true });
+      })))
+    : Promise.resolve([]);
 
-        return BlackMarketArt.findByIdAndUpdate(
-          listing._id,
-          {
-            price: newPrice,
-            $inc: { haggleCount: 1 },
-          },
-          { new: true },
-        ).populate('artwork');
-      });
-
-      return Promise.all(updatePromises);
-    })
-    .then((updatedListings) => {
-      res.status(200).send({
-        success: isSuccess,
-        listings: updatedListings,
-      });
-    })
+  artPromise.then((updatedListings) => {
+    // Handle Vouchers in-memory
+    const updatedVouchers = (vouchers || []).map((v) => ({
+      ...v,
+      price: Math.max(10, Math.floor(v.price * multiplier))
+    }));
+    res.status(200).send({
+      success: isSuccess,
+      listings: updatedListings,
+      vouchers: updatedVouchers,
+    });
+  })
     .catch((err) => {
       console.error('Failed to haggle', err);
       res.sendStatus(500);
