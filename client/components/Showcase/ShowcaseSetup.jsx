@@ -28,6 +28,7 @@ function ShowcaseSetup() {
   const [endDate, setEndDate] = useState('');
   const [auctionDate, setAuctionDate] = useState('');
   const [artPieces, setArtPieces] = useState([]);
+  const [saveError, setSaveError] = useState('');
 
   function loadForEdit(showcase) {
     setEditingId(showcase._id);
@@ -95,6 +96,7 @@ function ShowcaseSetup() {
   }
 
   function handleSave(isDraft) {
+    setSaveError('');
     const payload = {
       title,
       message,
@@ -115,7 +117,15 @@ function ShowcaseSetup() {
       .then(({ data }) => {
         navigate(isDraft ? '/home/profile' : `/home/showcase/${data._id}`);
       })
-      .catch((err) => console.error('Could not save showcase: ', err));
+      .catch((err) => {
+        if (err.response && err.response.status === 409) {
+          setSaveError(
+            'One or more selected art pieces are already in another showcase. Deselect them and try again.',
+          );
+        } else {
+          console.error('Could not save showcase: ', err);
+        }
+      });
   }
 
   function handleSubmit(event) {
@@ -297,6 +307,7 @@ function ShowcaseSetup() {
                 Cancel Edit
               </Button>
             )}
+            {saveError && <p className="text-danger mt-2">{saveError}</p>}
           </Form>
         </Card.Body>
       </Card>

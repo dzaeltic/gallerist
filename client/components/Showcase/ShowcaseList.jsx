@@ -25,7 +25,7 @@ function ShowcaseList() {
           <h1 className="mb-1"><strong>Showcases</strong></h1>
           <p className="text-muted mb-0">Featured exhibitions from the gallery&apos;s top curators.</p>
         </Col>
-        <Col xs="auto" className="d-flex align-items-center">
+        <Col xs="auto" className="d-flex align-items-center gap-3">
           <Button as={Link} to="/home/profile" variant="dark" size="lg">My Showcases</Button>
           <Button as={Link} to="/home/showcase/setup" variant="dark" size="lg">
             Create Showcase

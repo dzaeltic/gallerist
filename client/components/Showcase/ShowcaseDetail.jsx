@@ -57,14 +57,6 @@ function ShowcaseDetail() {
     );
   }
 
-  if (!showcase) {
-    return (
-      <Container>
-        <p>Loading showcase...</p>
-      </Container>
-    );
-  }
-
   const currentTrack = TRACKS.find((t) => t.value === playOrder[trackIndex]);
 
   return (
@@ -124,7 +116,7 @@ function ShowcaseDetail() {
             </Button>
           </div>
           <p className="text-muted mt-1">
-            {`Now playing track ${currentTrack ? currentTrack.label : 'track'} (${trackIndex + 1} of ${playOrder.length}${showcase.shuffle ? ', shuffled' : ''}`}
+            {`Now playing track ${currentTrack ? currentTrack.label : 'track'} (${trackIndex + 1} of ${playOrder.length}${showcase.shuffle ? ', shuffled' : ''})`}
           </p>
         </Row>
       )}
