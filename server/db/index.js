@@ -47,6 +47,12 @@ const ArtSchema = new Schema({
   },
 }, { timestamps: true });
 
+const CommentsSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
+  art: { type: Schema.Types.ObjectId, ref: 'Art' },
+  body: String,
+}, { timestamps: true });
+
 const MemeSchema = new Schema({
   title: String,
   imageUrl: String,
@@ -133,6 +139,7 @@ const UserArtSchema = new Schema({
 
 const User = model('User', UserSchema);
 const Art = model('Art', ArtSchema);
+const Comment = model('Comment', CommentsSchema);
 const Meme = model('Meme', MemeSchema);
 const Showcase = model('Showcase', ShowcaseSchema);
 const Vault = model('Vault', VaultSchema);
@@ -149,5 +156,5 @@ const BlackMarketArt = Art.discriminator('BlackMarket', new Schema({
 }));
 
 module.exports = {
-  User, Art, Meme, Vault, AICart, Watch, UserArt, BlackMarketArt, Showcase,
+  User, Art, Comment, Meme, Vault, AICart, Watch, UserArt, BlackMarketArt, Showcase,
 };
