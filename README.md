@@ -241,7 +241,17 @@ comments are accessible by clicking the image of the piece. Users can leave like
 
 ### **Canvas:**
 
+Added a page allowing for drawings to be made on a canvas. Any user made art can be sold and displayed on the gallery like any other art pieces. Drawings that users were working on can be saved and picked up later.
+
 ### **ShowCase:**
+
+The showcase event is essentially a user-created (curated) slideshow with music.
+Click Create Showcase -> Showcase Studio view -> complete the form:
+> _Title_, _Message/Description_, _startDate/endDate_ (sets public run time), _Music playlist_ selection\*, _Art piece_ selection, _Save draft_ (edit/publish/delete later) or _Publish_.
+- On clicking view Showcase, slideshow and playlist both auto-play.
+- User can also manually navigate next/previous image slides, play/pause/ff/rew music, adjust volume, and change playback speed. \*\*Pausing the music does not pause the image slides.
+> \***About playlists:** User can create a playlist by selecting any number of the provided songs in Showcase setup they want to include. They can choose the play order, including toggling shuffle, which overrides any previous order they may have set.
+> _Audio tracks are provided in `/server/public/audio`. They are all original, never-released, mostly rough/unfinished pieces of mine. There are no samples used that need to be cleared and no other licensing/permissions necessary to use them)._
 
 [Devin Delgado](https://github.com/dzaeltic)
 [Garrin Costa Jr.](https://github.com/Gmcjr)
